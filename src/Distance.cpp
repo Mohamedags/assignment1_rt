@@ -50,15 +50,24 @@ void calculateDistance_PublishAndCheck(std::string robot)
         
         if (robot == "turtle1") {
             stop_turtle1 = true; 
-            const char* turtle_moving1 ="turtle1";
-            ROS_WARN("Turtles are too close to each other! Stopping the %s", turtle_moving1);
+            ROS_WARN("Turtles are too close to each other! Stopping turtle 1");
             
         } else if (robot == "turtle2") {
             stop_turtle2 = true; 
-            const char* turtle_moving2 ="turtle2";
-            ROS_WARN("Turtles are too close to each other! Stopping the %s", turtle_moving2);
+            ROS_WARN("Turtles are too close to each other! Stopping turtle 2");
         }
     }
+    
+    if (turtle1_pose.x > 10.0 || turtle1_pose.x < 1.0 || turtle1_pose.y > 10.0 || turtle1_pose.y < 1.0) {
+        ROS_WARN("Turtle1 is too close to the boundary!");
+        stop_turtle1 = true;
+    }
+
+    if (turtle2_pose.x > 10.0 || turtle2_pose.x < 1.0 || turtle2_pose.y > 10.0 || turtle2_pose.y < 1.0) {
+        ROS_WARN("Turtle2 is too close to the boundary!");
+        stop_turtle2 = true;
+    }
+    
     geometry_msgs::Twist stop_msg;  
     if (stop_turtle1) {
         cmd_vel_pub_1.publish(stop_msg);
