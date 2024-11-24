@@ -31,7 +31,7 @@ def UI():
 
            rospy.loginfo(f"Setting {robot} velocity: Linear Velocity = {linear_velocity} m/s, Angular Velocity = {angular_velocity} rad/s")
 
-           rate = rospy.Rate(10)  
+           rate = rospy.Rate(2)  
            start_time = rospy.Time.now()
            while (rospy.Time.now() - start_time).to_sec() < 1.0:
                 pub.publish(cmd_vel)

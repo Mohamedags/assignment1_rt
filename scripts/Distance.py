@@ -55,17 +55,37 @@ def Publish_distanceAndstop_turtles():
             cmd_vel_pub_2.publish(stop_msg)
             turtle2_moving = False  
             
-    else:
+    if (turtle1_pose.x < 1 or turtle1_pose.x > 10.0 or 
+        turtle1_pose.y < 1 or turtle1_pose.y > 10.0):
+        rospy.logwarn("Turtle1 is too close to the boundary! Stopping turtle1.")
+        if turtle1_moving:
+            stop_msg = Twist()  
+            cmd_vel_pub_1.publish(stop_msg)
+            turtle1_moving = False  
+
+    if (turtle2_pose.x < 1 or turtle2_pose.x > 10.0 or 
+        turtle2_pose.y < 1 or turtle2_pose.y > 10.0):
+        rospy.logwarn("Turtle2 is too close to the boundary! Stopping turtle2.")
+        if turtle2_moving:
+            stop_msg = Twist()  
+            cmd_vel_pub_2.publish(stop_msg)
+            turtle2_moving = False  
+
+    if distance >= DISTANCE_THRESHOLD and not (turtle1_pose.x < 1 or turtle1_pose.x > 10.0 or 
+                                                turtle1_pose.y < 1 or turtle1_pose.y > 10.0):
         if not turtle1_moving:
             move_msg = Twist()
             move_msg.linear.x = 1.0  
             cmd_vel_pub_1.publish(move_msg)
             turtle1_moving = True  
+
+    if distance >= DISTANCE_THRESHOLD and not (turtle2_pose.x < 1 or turtle2_pose.x > 10.0 or 
+                                                turtle2_pose.y < 1 or turtle2_pose.y > 10.0):
         if not turtle2_moving:
             move_msg = Twist()
             move_msg.linear.x = 1.0  
             cmd_vel_pub_2.publish(move_msg)
-            turtle2_moving = True  
+            turtle2_moving = True   
             
                 
 def Distance():
