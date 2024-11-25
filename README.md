@@ -26,7 +26,7 @@ This repository named `assignment1_rt` implements two ROS nodes for controlling 
 - we created a new package using `catkin_create_pkg assignment std_msgs roscpp rospy`.
 - we created two nodes in the `src` directory named `UI` and `Distance` using cpp and modify the `CMakeLists.txt` file accordingly, doing the same using python in the `scripts` directory.
 
-##File structure:
+## File structure:
 
 ├─assignment1_rt/ <br>
 ├── CMakeLists.txt <br>
