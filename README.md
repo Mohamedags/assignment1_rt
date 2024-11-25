@@ -102,6 +102,6 @@ rosrun assignment1_rt Distance_node
 - In python : <br>
 ```bash
 rosrun assignment1_rt Distance.py
-``` <br>
+``` 
 
 ![Example GIF](images/Example_assignment1_rt.gif)
