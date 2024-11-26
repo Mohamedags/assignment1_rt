@@ -13,9 +13,7 @@ cmd_vel_pub_2 = None
 
 
 DISTANCE_THRESHOLD = 2.0
-
-turtle1_moving = True
-turtle2_moving = True
+REPEL_VELOCITY = 1.0
 
 
 def turtle1_pose_callback(msg):
@@ -29,8 +27,8 @@ def turtle2_pose_callback(msg):
     turtle2_pose = msg
     
 def Publish_distanceAndstop_turtles():
-    """Stop both turtles if they are too close to each other"""
-    global cmd_vel_pub_1, cmd_vel_pub_2, turtle1_moving, turtle2_moving
+    """Repel turtles if they are too close to each other"""
+    global cmd_vel_pub_1, cmd_vel_pub_2
     
     dx = turtle1_pose.x - turtle2_pose.x
     dy = turtle1_pose.y - turtle2_pose.y
@@ -43,49 +41,75 @@ def Publish_distanceAndstop_turtles():
     
     
     if distance < DISTANCE_THRESHOLD:
-        rospy.logwarn("Turtles are too close! Stopping the moving turtle.")
+        rospy.logwarn("Turtles are too close! Repel them !!")
         
-        if turtle1_moving:
-            stop_msg = Twist()  
-            cmd_vel_pub_1.publish(stop_msg)
-            turtle1_moving = False  
-            
-        if turtle2_moving:
-            stop_msg = Twist()  
-            cmd_vel_pub_2.publish(stop_msg)
-            turtle2_moving = False  
-            
-    if (turtle1_pose.x < 1 or turtle1_pose.x > 10.0 or 
-        turtle1_pose.y < 1 or turtle1_pose.y > 10.0):
-        rospy.logwarn("Turtle1 is too close to the boundary! Stopping turtle1.")
-        if turtle1_moving:
-            stop_msg = Twist()  
-            cmd_vel_pub_1.publish(stop_msg)
-            turtle1_moving = False  
+        if distance > 0: 
+            unit_vector_x = dx / distance
+            unit_vector_y = dy / distance
+        else:
+            unit_vector_x = 0
+            unit_vector_y = 0
+        
+        repel_msg_1 = Twist()
+        repel_msg_1.linear.x = REPEL_VELOCITY * unit_vector_x
+        repel_msg_1.linear.y = REPEL_VELOCITY * unit_vector_y
+        cmd_vel_pub_1.publish(repel_msg_1)
 
-    if (turtle2_pose.x < 1 or turtle2_pose.x > 10.0 or 
-        turtle2_pose.y < 1 or turtle2_pose.y > 10.0):
-        rospy.logwarn("Turtle2 is too close to the boundary! Stopping turtle2.")
-        if turtle2_moving:
-            stop_msg = Twist()  
-            cmd_vel_pub_2.publish(stop_msg)
-            turtle2_moving = False  
+        repel_msg_2 = Twist()
+        repel_msg_2.linear.x = -REPEL_VELOCITY * unit_vector_x
+        repel_msg_2.linear.y = -REPEL_VELOCITY * unit_vector_y
+        cmd_vel_pub_2.publish(repel_msg_2)
 
-    if distance >= DISTANCE_THRESHOLD and not (turtle1_pose.x < 1 or turtle1_pose.x > 10.0 or 
-                                                turtle1_pose.y < 1 or turtle1_pose.y > 10.0):
-        if not turtle1_moving:
-            move_msg = Twist()
-            move_msg.linear.x = 1.0  
-            cmd_vel_pub_1.publish(move_msg)
-            turtle1_moving = True  
+    
+    if turtle1_pose.x < 1.0:  
+        rospy.logwarn("Turtle1 is too close to the left boundary! Repelling.")
+        repel_msg_1 = Twist()
+        repel_msg_1.linear.x = REPEL_VELOCITY  
+        cmd_vel_pub_1.publish(repel_msg_1)
+    
+    if turtle1_pose.x > 10.0:  
+        rospy.logwarn("Turtle1 is too close to the right boundary! Repelling.")
+        repel_msg_1 = Twist()
+        repel_msg_1.linear.x = -REPEL_VELOCITY  
+        cmd_vel_pub_1.publish(repel_msg_1)
+    
+    if turtle1_pose.y < 1.0:  
+        rospy.logwarn("Turtle1 is too close to the bottom boundary! Repelling.")
+        repel_msg_1 = Twist()
+        repel_msg_1.linear.y = REPEL_VELOCITY  
+        cmd_vel_pub_1.publish(repel_msg_1)
 
-    if distance >= DISTANCE_THRESHOLD and not (turtle2_pose.x < 1 or turtle2_pose.x > 10.0 or 
-                                                turtle2_pose.y < 1 or turtle2_pose.y > 10.0):
-        if not turtle2_moving:
-            move_msg = Twist()
-            move_msg.linear.x = 1.0  
-            cmd_vel_pub_2.publish(move_msg)
-            turtle2_moving = True   
+    if turtle1_pose.y > 10.0:  
+        rospy.logwarn("Turtle1 is too close to the top boundary! Repelling.")
+        repel_msg_1 = Twist()
+        repel_msg_1.linear.y = -REPEL_VELOCITY  
+        cmd_vel_pub_1.publish(repel_msg_1)
+    
+   
+    if turtle2_pose.x < 1.0:  
+        rospy.logwarn("Turtle2 is too close to the left boundary! Repelling.")
+        repel_msg_2 = Twist()
+        repel_msg_2.linear.x = REPEL_VELOCITY  
+        cmd_vel_pub_2.publish(repel_msg_2)
+    
+    if turtle2_pose.x > 10.0:  
+        rospy.logwarn("Turtle2 is too close to the right boundary! Repelling.")
+        repel_msg_2 = Twist()
+        repel_msg_2.linear.x = -REPEL_VELOCITY  
+        cmd_vel_pub_2.publish(repel_msg_2)
+    
+    if turtle2_pose.y < 1.0:  
+        rospy.logwarn("Turtle2 is too close to the bottom boundary! Repelling.")
+        repel_msg_2 = Twist()
+        repel_msg_2.linear.y = REPEL_VELOCITY  
+        cmd_vel_pub_2.publish(repel_msg_2)
+
+    if turtle2_pose.y > 10.0:  
+        rospy.logwarn("Turtle2 is too close to the top boundary! Repelling.")
+        repel_msg_2 = Twist()
+        repel_msg_2.linear.y = -REPEL_VELOCITY  
+        cmd_vel_pub_2.publish(repel_msg_2)
+   
             
                 
 def Distance():

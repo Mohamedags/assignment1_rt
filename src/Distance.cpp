@@ -13,6 +13,7 @@ ros::Publisher cmd_vel_pub_1;
 ros::Publisher cmd_vel_pub_2;  
 
 const double DISTANCE_THRESHOLD = 2.0;
+const double REPEL_VELOCITY = 1.0;  
 
 void turtle1PoseCallback(const turtlesim::Pose::ConstPtr& msg)
 {
@@ -47,37 +48,84 @@ void calculateDistance_PublishAndCheck(std::string robot)
 
     bool stop_turtle1 = false, stop_turtle2 = false;
     if (distance < DISTANCE_THRESHOLD) {
-        
-        if (robot == "turtle1") {
-            stop_turtle1 = true; 
-            ROS_WARN("Turtles are too close to each other! Stopping turtle 1");
-            
-        } else if (robot == "turtle2") {
-            stop_turtle2 = true; 
-            ROS_WARN("Turtles are too close to each other! Stopping turtle 2");
-        }
-    }
     
-    if (turtle1_pose.x > 10.0 || turtle1_pose.x < 1.0 || turtle1_pose.y > 10.0 || turtle1_pose.y < 1.0) {
-        ROS_WARN("Turtle1 is too close to the boundary!");
-        stop_turtle1 = true;
+        double unit_vector_x = dx / distance;
+        double unit_vector_y = dy / distance;
+        
+        // repelling turtles when close to each other
+        geometry_msgs::Twist repel_msg_1;
+        repel_msg_1.linear.x = REPEL_VELOCITY * unit_vector_x;  // Repel turtle1 
+        repel_msg_1.linear.y = REPEL_VELOCITY * unit_vector_y;
+
+        geometry_msgs::Twist repel_msg_2;
+        repel_msg_2.linear.x = -REPEL_VELOCITY * unit_vector_x; // Repel turtle2 
+        repel_msg_2.linear.y = -REPEL_VELOCITY * unit_vector_y;
+
+        
+        cmd_vel_pub_1.publish(repel_msg_1);
+        cmd_vel_pub_2.publish(repel_msg_2);
+
+        ROS_WARN("Turtles are too close! Applying repelling velocities.");
+        }
+
+        // Check for Turtle 1 border crossing
+    if (turtle1_pose.x < 1.0) {  
+        ROS_WARN("Turtle1 is too close to the left boundary!");
+        geometry_msgs::Twist repel_msg_1;
+        repel_msg_1.linear.x = REPEL_VELOCITY;  
+        cmd_vel_pub_1.publish(repel_msg_1);
     }
 
-    if (turtle2_pose.x > 10.0 || turtle2_pose.x < 1.0 || turtle2_pose.y > 10.0 || turtle2_pose.y < 1.0) {
-        ROS_WARN("Turtle2 is too close to the boundary!");
-        stop_turtle2 = true;
+    if (turtle1_pose.x > 10.0) {  
+        ROS_WARN("Turtle1 is too close to the right boundary!");
+        geometry_msgs::Twist repel_msg_1;
+        repel_msg_1.linear.x = -REPEL_VELOCITY;  
+        cmd_vel_pub_1.publish(repel_msg_1);
     }
-    
-    geometry_msgs::Twist stop_msg;  
-    if (stop_turtle1) {
-        cmd_vel_pub_1.publish(stop_msg);
+
+    if (turtle1_pose.y < 1.0) { 
+        ROS_WARN("Turtle1 is too close to the bottom boundary!");
+        geometry_msgs::Twist repel_msg_1;
+        repel_msg_1.linear.y = REPEL_VELOCITY;  
+        cmd_vel_pub_1.publish(repel_msg_1);
     }
-        
-    if (stop_turtle2) {
-        cmd_vel_pub_2.publish(stop_msg);
+
+    if (turtle1_pose.y > 10.0) {  
+        ROS_WARN("Turtle1 is too close to the top boundary!");
+        geometry_msgs::Twist repel_msg_1;
+        repel_msg_1.linear.y = -REPEL_VELOCITY;  
+        cmd_vel_pub_1.publish(repel_msg_1);
+    }
+
+        // Check for Turtle 2 border crossing
+    if (turtle2_pose.x < 1.0) {  
+        ROS_WARN("Turtle2 is too close to the left boundary!");
+        geometry_msgs::Twist repel_msg_2;
+        repel_msg_2.linear.x = REPEL_VELOCITY;  
+        cmd_vel_pub_2.publish(repel_msg_2);
+    }
+
+    if (turtle2_pose.x > 10.0) {  
+        ROS_WARN("Turtle2 is too close to the right boundary!");
+        geometry_msgs::Twist repel_msg_2;
+        repel_msg_2.linear.x = -REPEL_VELOCITY;  
+        cmd_vel_pub_2.publish(repel_msg_2);
+    }
+
+    if (turtle2_pose.y < 1.0) {  
+        ROS_WARN("Turtle2 is too close to the bottom boundary!");
+        geometry_msgs::Twist repel_msg_2;
+        repel_msg_2.linear.y = REPEL_VELOCITY;  
+        cmd_vel_pub_2.publish(repel_msg_2);
+    }
+
+    if (turtle2_pose.y > 10.0) {  
+        ROS_WARN("Turtle2 is too close to the top boundary!");
+        geometry_msgs::Twist repel_msg_2;
+        repel_msg_2.linear.y = -REPEL_VELOCITY;  
+        cmd_vel_pub_2.publish(repel_msg_2);
     }
 }
-
 int main(int argc, char** argv) {
     ros::init(argc, argv, "distance_node");
     ros::NodeHandle nh;

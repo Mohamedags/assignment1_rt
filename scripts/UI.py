@@ -9,7 +9,7 @@ def UI():
     try:
         spawn_turtle = rospy.ServiceProxy('/spawn', Spawn)
         
-        spawn_turtle(2.0, 1.0, 0.0, 'turtle2')
+        spawn_turtle(2.0, 2.0, 0.0, 'turtle2')
         rospy.loginfo("Turtle 2 was spawned successfully!")
 
         while not rospy.is_shutdown():
