@@ -84,7 +84,6 @@ rosrun assignment1_rt Distance_node
 - In python : <br>
 ```bash
 rosrun assignment1_rt Distance.py
-<<<<<<< HEAD
 ```
 - Illustration 1: Turtles repulse each other or boundries 
 ![Example GIF](images/repulsing.gif)
