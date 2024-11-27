@@ -75,6 +75,10 @@ rosrun assignment1_rt UI_node
 - In python : <br>
 ```bash
 rosrun assignment1_rt UI.py
+Turtle 2 was spawned successfully!
+Enter the robot you want to control (turtle1/turtle2): turtle2
+Enter the linear velocity for turtle2 (m/s): 6
+Enter the angular velocity for turtle2 (rad/s): 2
 ```
 3. **Run the Distance Node:**
 - In cpp : <br>
